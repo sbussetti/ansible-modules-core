@@ -962,7 +962,7 @@ class ElbManager(object):
         attributes = self.elb.get_attributes()
         if self.connection_draining_timeout is not None:
             if not attributes.connection_draining.enabled or \
-                    attributes.connection_draining.timeout != self.connection_draining_timeout:
+                    str(attributes.connection_draining.timeout) != str(self.connection_draining_timeout):
                 self.changed = True
             attributes.connection_draining.enabled = True
             attributes.connection_draining.timeout = self.connection_draining_timeout
