@@ -415,13 +415,13 @@ def has_local_mods(module, git_path, dest, bare):
 
     return len(lines) > 0
 
-def reset(git_path, module, dest):
+def reset(git_path, module, dest, head='HEAD'):
     '''
     Resets the index and working tree to HEAD.
     Discards any changes to tracked files in working
     tree since that commit.
     '''
-    cmd = "%s reset --hard HEAD" % (git_path,)
+    cmd = "%s reset --hard %s" % (git_path, head)
     return module.run_command(cmd, check_rc=True, cwd=dest)
 
 def get_diff(module, git_path, dest, repo, remote, depth, bare, before, after):
@@ -961,9 +961,6 @@ def main():
             # failure should happen regardless of check mode
             if not force:
                 module.fail_json(msg="Local modifications exist in repository (force=no).", **result)
-            # if force and in non-check mode, do a reset
-            if not module.check_mode:
-                reset(git_path, module, dest)
 
         # exit if already at desired sha version
         if module.check_mode:
@@ -988,6 +985,12 @@ def main():
                 fetch(git_path, module, repo, dest, version, remote, depth, bare, refspec, git_version_used)
 
         result['after'] = get_version(module, git_path, dest)
+
+        if local_mods:
+            # if force and in non-check mode, do a reset
+            if not module.check_mode:
+                remote_head = get_remote_head(git_path, module, dest, version, remote, bare)
+                reset(git_path, module, dest, head=remote_head)
 
         if result['before'] == result['after']:
             if local_mods:
