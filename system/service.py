@@ -18,6 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: service
@@ -74,29 +78,51 @@ options:
         description:
         - Additional arguments provided on the command line
         aliases: [ 'args' ]
+    use:
+        description:
+            - The service module actually uses system specific modules, normally through auto detection, this setting can force a specific module.
+            - Normally it uses the value of the 'ansible_service_mgr' fact and falls back to the old 'service' module when none matching is found.
+        default: 'auto'
+        version_added: 2.2
 '''
 
 EXAMPLES = '''
 # Example action to start service httpd, if not running
-- service: name=httpd state=started
+- service:
+    name: httpd
+    state: started
 
 # Example action to stop service httpd, if running
-- service: name=httpd state=stopped
+- service:
+    name: httpd
+    state: stopped
 
 # Example action to restart service httpd, in all cases
-- service: name=httpd state=restarted
+- service:
+    name: httpd
+    state: restarted
 
 # Example action to reload service httpd, in all cases
-- service: name=httpd state=reloaded
+- service:
+    name: httpd
+    state: reloaded
 
 # Example action to enable service httpd, and not touch the running state
-- service: name=httpd enabled=yes
+- service:
+    name: httpd
+    enabled: yes
 
 # Example action to start service foo, based on running process /usr/bin/foo
-- service: name=foo pattern=/usr/bin/foo state=started
+- service:
+    name: foo
+    pattern: /usr/bin/foo
+    state: started
 
 # Example action to restart network service for interface eth0
-- service: name=network state=restarted args=eth0
+- service:
+    name: network
+    state: restarted
+    args: eth0
 
 '''
 
@@ -109,6 +135,7 @@ import select
 import time
 import string
 import glob
+from ansible.module_utils.service import fail_if_missing
 
 # The distutils module is not shipped with SUNWPython on Solaris.
 # It's in the SUNWPython-devel package which also contains development files
@@ -471,7 +498,7 @@ class LinuxService(Service):
                 self.enable_cmd = location['chkconfig']
 
         if self.enable_cmd is None:
-            self.module.fail_json(msg="no service or tool found for: %s" % self.name)
+            fail_if_missing(self.module, False, self.name, msg='host')
 
         # If no service control tool selected yet, try to see if 'service' is available
         if self.svc_cmd is None and location.get('service', False):
@@ -1545,4 +1572,5 @@ def main():
 
 from ansible.module_utils.basic import *
 
-main()
+if __name__ == '__main__':
+    main()

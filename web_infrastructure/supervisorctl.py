@@ -21,6 +21,10 @@
 import os
 from ansible.module_utils.basic import AnsibleModule, is_executable
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'community',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: supervisorctl
@@ -83,16 +87,28 @@ author:
 
 EXAMPLES = '''
 # Manage the state of program to be in 'started' state.
-- supervisorctl: name=my_app state=started
+- supervisorctl:
+    name: my_app
+    state: started
 
 # Manage the state of program group to be in 'started' state.
-- supervisorctl: name='my_apps:' state=started
+- supervisorctl:
+    name: 'my_apps:'
+    state: started
 
 # Restart my_app, reading supervisorctl configuration from a specified file.
-- supervisorctl: name=my_app state=restarted config=/var/opt/my_project/supervisord.conf
+- supervisorctl:
+    name: my_app
+    state: restarted
+    config: /var/opt/my_project/supervisord.conf
 
 # Restart my_app, connecting to supervisord with credentials and server URL.
-- supervisorctl: name=my_app state=restarted username=test password=testpass server_url=http://localhost:9001
+- supervisorctl:
+    name: my_app
+    state: restarted
+    username: test
+    password: testpass
+    server_url: http://localhost:9001
 '''
 
 

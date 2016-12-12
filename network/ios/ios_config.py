@@ -16,6 +16,10 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = """
 ---
 module: ios_config
@@ -391,7 +395,7 @@ def main():
     except NetworkError:
         exc = get_exception()
         module.disconnect()
-        module.fail_json(msg=str(exc), stdout=exc.kwargs.get('stdout'))
+        module.fail_json(msg=str(exc))
 
     module.disconnect()
     module.exit_json(**result)

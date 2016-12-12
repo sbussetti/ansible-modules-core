@@ -36,6 +36,10 @@ try:
 except:
     transaction_helpers = False
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: yum
@@ -156,31 +160,50 @@ author:
 
 EXAMPLES = '''
 - name: install the latest version of Apache
-  yum: name=httpd state=latest
+  yum:
+    name: httpd
+    state: latest
 
 - name: remove the Apache package
-  yum: name=httpd state=absent
+  yum:
+    name: httpd
+    state: absent
 
 - name: install the latest version of Apache from the testing repo
-  yum: name=httpd enablerepo=testing state=present
+  yum:
+    name: httpd
+    enablerepo: testing
+    state: present
 
 - name: install one specific version of Apache
-  yum: name=httpd-2.2.29-1.4.amzn1 state=present
+  yum:
+    name: httpd-2.2.29-1.4.amzn1
+    state: present
 
 - name: upgrade all packages
-  yum: name=* state=latest
+  yum:
+    name: '*'
+    state: latest
 
 - name: install the nginx rpm from a remote repo
-  yum: name=http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm state=present
+  yum:
+    name: http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+    state: present
 
 - name: install nginx rpm from a local file
-  yum: name=/usr/local/src/nginx-release-centos-6-0.el6.ngx.noarch.rpm state=present
+  yum:
+    name: /usr/local/src/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+    state: present
 
 - name: install the 'Development tools' package group
-  yum: name="@Development tools" state=present
+  yum:
+    name: "@Development tools"
+    state: present
 
 - name: install the 'Gnome desktop' environment group
-  yum: name="@^gnome-desktop-environment" state=present
+  yum:
+    name: "@^gnome-desktop-environment"
+    state: present
 '''
 
 # 64k.  Number of bytes to read at a time when manually downloading pkgs via a url
@@ -858,7 +881,7 @@ def latest(module, items, repoq, yum_basecmd, conf_file, en_repos, dis_repos):
                 # or virtual provides (like "python-*" or "smtp-daemon") while
                 # updates contains name only.
                 this_name_only = '-'.join(this.split('-')[:-2])
-                if spec in pkgs['update'] and this_name_only in updates.keys():
+                if spec in pkgs['update'] and this_name_only in updates:
                     nothing_to_do = False
                     will_update.add(spec)
                     # Massage the updates list

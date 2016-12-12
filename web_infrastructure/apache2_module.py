@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'community',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: apache2_module
@@ -47,10 +51,14 @@ requirements: ["a2enmod","a2dismod"]
 
 EXAMPLES = '''
 # enables the Apache2 module "wsgi"
-- apache2_module: state=present name=wsgi
+- apache2_module:
+    state: present
+    name: wsgi
 
 # disables the Apache2 module "wsgi"
-- apache2_module: state=absent name=wsgi
+- apache2_module:
+    state: absent
+    name: wsgi
 '''
 
 import re

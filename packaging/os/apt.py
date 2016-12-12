@@ -19,6 +19,10 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: apt
@@ -177,7 +181,7 @@ EXAMPLES = '''
   apt:
     upgrade: dist
     update_cache: yes
-    dpkg_options: force-confold,force-confdef
+    dpkg_options: 'force-confold,force-confdef'
 
 - name: Install a .deb package
   apt:

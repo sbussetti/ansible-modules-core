@@ -18,6 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: copy
@@ -102,19 +106,43 @@ notes:
 
 EXAMPLES = '''
 # Example from Ansible Playbooks
-- copy: src=/srv/myfiles/foo.conf dest=/etc/foo.conf owner=foo group=foo mode=0644
+- copy:
+    src: /srv/myfiles/foo.conf
+    dest: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: 0644
 
 # The same example as above, but using a symbolic mode equivalent to 0644
-- copy: src=/srv/myfiles/foo.conf dest=/etc/foo.conf owner=foo group=foo mode="u=rw,g=r,o=r"
+- copy:
+    src: /srv/myfiles/foo.conf
+    dest: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: "u=rw,g=r,o=r"
 
 # Another symbolic mode example, adding some permissions and removing others
-- copy: src=/srv/myfiles/foo.conf dest=/etc/foo.conf owner=foo group=foo mode="u+rw,g-wx,o-rwx"
+- copy:
+    src: /srv/myfiles/foo.conf
+    dest: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: "u+rw,g-wx,o-rwx"
 
 # Copy a new "ntp.conf file into place, backing up the original if it differs from the copied version
-- copy: src=/mine/ntp.conf dest=/etc/ntp.conf owner=root group=root mode=644 backup=yes
+- copy:
+    src: /mine/ntp.conf
+    dest: /etc/ntp.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
 
 # Copy a new "sudoers" file into place, after passing validation with visudo
-- copy: src=/mine/sudoers dest=/etc/sudoers validate='visudo -cf %s'
+- copy:
+    src: /mine/sudoers
+    dest: /etc/sudoers
+    validate: 'visudo -cf %s'
 '''
 
 RETURN = '''

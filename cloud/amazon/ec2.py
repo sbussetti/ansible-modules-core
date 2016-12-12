@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'committer',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: ec2
@@ -434,12 +438,21 @@ EXAMPLES = '''
          vpc_subnet_id: subnet-29e63245
          assign_public_ip: yes
       register: ec2
+
     - name: Add new instance to host group
-      add_host: hostname={{ item.public_ip }} groupname=launched
-      with_items: '{{ec2.instances}}'
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: launched
+      with_items: "{{ ec2.instances }}"
+
     - name: Wait for SSH to come up
-      wait_for: host={{ item.public_dns_name }} port=22 delay=60 timeout=320 state=started
-      with_items: '{{ec2.instances}}'
+      wait_for:
+        host: "{{ item.public_dns_name }}"
+        port: 22
+        delay: 60
+        timeout: 320
+        state: started
+      with_items: "{{ ec2.instances }}"
 
 - name: Configure instance(s)
   hosts: launched
@@ -1615,4 +1628,5 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-main()
+if __name__ == '__main__':
+    main()

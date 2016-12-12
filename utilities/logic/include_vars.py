@@ -8,6 +8,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'core',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 author: "Allen Sanabria (@linuxdynasty)"
@@ -61,15 +65,17 @@ EXAMPLES = """
     name: stuff
 
 # Conditionally decide to load in variables into 'plans' when x is 0, otherwise do not. (2.2)
-- include_vars: file=contingency_plan.yml name=plans
+- include_vars:
+    file: contingency_plan.yml
+    name: plans
   when: x == 0
 
 # Load a variable file based on the OS type, or a default if not found.
 - include_vars: "{{ item }}"
   with_first_found:
-   - "{{ ansible_distribution }}.yml"
-   - "{{ ansible_os_family }}.yml"
-   - "default.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
 
 # bare include (free-form)
 - include_vars: myvars.yml

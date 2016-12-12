@@ -19,6 +19,10 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'community',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: apt_rpm
@@ -50,13 +54,25 @@ notes:  []
 
 EXAMPLES = '''
 # install package foo
-- apt_rpm: pkg=foo state=present
+- apt_rpm:
+    pkg: foo
+    state: present
+
 # remove package foo
-- apt_rpm: pkg=foo state=absent
-# description: remove packages foo and bar 
-- apt_rpm: pkg=foo,bar state=absent
-# description: update the package database and install bar (bar will be the updated if a newer version exists) 
-- apt_rpm: name=bar state=present update_cache=yes     
+- apt_rpm:
+    pkg: foo
+    state: absent
+
+# description: remove packages foo and bar
+- apt_rpm:
+    pkg: foo,bar
+    state: absent
+
+# description: update the package database and install bar (bar will be the updated if a newer version exists)
+- apt_rpm:
+    name: bar
+    state: present
+    update_cache: yes
 '''
 
 
@@ -167,4 +183,5 @@ def main():
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *
     
-main()        
+if __name__ == '__main__':
+    main()

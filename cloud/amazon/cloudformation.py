@@ -21,6 +21,10 @@
 # - move create/update code out of main
 # - unit tests
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'committer',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: cloudformation
@@ -143,9 +147,11 @@ EXAMPLES = '''
 # Use a template from a URL
 - name: launch ansible cloudformation example
   cloudformation:
-    stack_name="ansible-cloudformation" state=present
-    region=us-east-1 disable_rollback=true
-    template_url=https://s3.amazonaws.com/my-bucket/cloudformation.template
+    stack_name: "ansible-cloudformation"
+    state: present
+    region: us-east-1
+    disable_rollback: true
+    template_url: https://s3.amazonaws.com/my-bucket/cloudformation.template
   args:
     template_parameters:
       KeyName: jmartin
@@ -158,10 +164,12 @@ EXAMPLES = '''
 # Use a template from a URL, and assume a role to execute
 - name: launch ansible cloudformation example with role assumption
   cloudformation:
-    stack_name="ansible-cloudformation" state=present
-    region=us-east-1 disable_rollback=true
-    template_url=https://s3.amazonaws.com/my-bucket/cloudformation.template
-    role_arn: arn:aws:iam::123456789012:role/cloudformation-iam-role
+    stack_name: "ansible-cloudformation"
+    state: present
+    region: us-east-1
+    disable_rollback: true
+    template_url: https://s3.amazonaws.com/my-bucket/cloudformation.template
+    role_arn: 'arn:aws:iam::123456789012:role/cloudformation-iam-role'
   args:
     template_parameters:
       KeyName: jmartin
@@ -257,11 +265,11 @@ def get_stack_events(cfn, stack_name):
         return ret
 
     for e in events.get('StackEvents', []):
-        eventline = 'StackEvent {} {} {}'.format(e['ResourceType'], e['LogicalResourceId'], e['ResourceStatus'])
+        eventline = 'StackEvent {ResourceType} {LogicalResourceId} {ResourceStatus}'.format(**e)
         ret['events'].append(eventline)
 
         if e['ResourceStatus'].endswith('FAILED'):
-            failline = '{} {} {}: {}'.format(e['ResourceType'], e['LogicalResourceId'], e['ResourceStatus'], e['ResourceStatusReason'])
+            failline = '{ResourceType} {LogicalResourceId} {ResourceStatus}: {ResourceStatusReason}'.format(**e)
             ret['log'].append(failline)
 
     return ret
@@ -335,20 +343,6 @@ def get_stack_facts(cfn, stack_name):
 
     return stack_info
 
-IGNORE_CODE = 'Throttling'
-MAX_RETRIES=3
-def invoke_with_throttling_retries(function_ref, *argv, **kwargs):
-    retries=0
-    while True:
-        try:
-            retval=function_ref(*argv, **kwargs)
-            return retval
-        except Exception as e:
-            # boto way of looking for retries
-            #if e.code != IGNORE_CODE or retries==MAX_RETRIES:
-            raise e
-        time.sleep(5 * (2**retries))
-        retries += 1
 
 def main():
     argument_spec = ansible.module_utils.ec2.ec2_argument_spec()

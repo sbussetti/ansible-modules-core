@@ -16,6 +16,10 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'community',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 
@@ -66,9 +70,9 @@ EXAMPLES = '''
     master: true
     stratum: 12
     logging: false
-    host: {{ inventory_hostname }}
-    username: {{ un }}
-    password: {{ pwd }}
+    host: "{{ inventory_hostname }}"
+    username: "{{ un }}"
+    password: "{{ pwd }}"
 '''
 
 RETURN = '''

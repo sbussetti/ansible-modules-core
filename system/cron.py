@@ -31,6 +31,10 @@
 # This module is based on python-crontab by Martin Owens.
 #
 
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'committer',
+                    'version': '1.0'}
+
 DOCUMENTATION = """
 ---
 module: cron
@@ -171,32 +175,59 @@ author:
 EXAMPLES = '''
 # Ensure a job that runs at 2 and 5 exists.
 # Creates an entry like "0 5,2 * * ls -alh > /dev/null"
-- cron: name="check dirs" minute="0" hour="5,2" job="ls -alh > /dev/null"
+- cron:
+    name: "check dirs"
+    minute: "0"
+    hour: "5,2"
+    job: "ls -alh > /dev/null"
 
 # Ensure an old job is no longer present. Removes any job that is prefixed
 # by "#Ansible: an old job" from the crontab
-- cron: name="an old job" state=absent
+- cron:
+    name: "an old job"
+    state: absent
 
 # Creates an entry like "@reboot /some/job.sh"
-- cron: name="a job for reboot" special_time=reboot job="/some/job.sh"
+- cron:
+    name: "a job for reboot"
+    special_time: reboot
+    job: "/some/job.sh"
 
 # Creates an entry like "PATH=/opt/bin" on top of crontab
-- cron: name=PATH env=yes value=/opt/bin
+- cron:
+    name: PATH
+    env: yes
+    value: /opt/bin
 
 # Creates an entry like "APP_HOME=/srv/app" and insert it after PATH
 # declaration
-- cron: name=APP_HOME env=yes value=/srv/app insertafter=PATH
+- cron:
+    name: APP_HOME
+    env: yes
+    value: /srv/app
+    insertafter: PATH
 
 # Creates a cron file under /etc/cron.d
-- cron: name="yum autoupdate" weekday="2" minute=0 hour=12
-        user="root" job="YUMINTERACTIVE=0 /usr/sbin/yum-autoupdate"
-        cron_file=ansible_yum-autoupdate
+- cron:
+    name: yum autoupdate
+    weekday: 2
+    minute: 0
+    hour: 12
+    user: root
+    job: "YUMINTERACTIVE: 0 /usr/sbin/yum-autoupdate"
+    cron_file: ansible_yum-autoupdate
 
 # Removes a cron file from under /etc/cron.d
-- cron: name="yum autoupdate" cron_file=ansible_yum-autoupdate state=absent
+- cron:
+    name: "yum autoupdate"
+    cron_file: ansible_yum-autoupdate
+    state: absent
 
 # Removes "APP_HOME" environment variable from crontab
-- cron: name=APP_HOME env=yes state=absent
+- cron:
+    name: APP_HOME
+    env: yes
+    state: absent
 '''
 
 import os
@@ -205,6 +236,12 @@ import re
 import tempfile
 import platform
 import pipes
+
+try:
+    import selinux
+    HAS_SELINUX = True
+except ImportError:
+    HAS_SELINUX = False
 
 CRONCMD = "/usr/bin/crontab"
 
@@ -306,6 +343,10 @@ class CronTab(object):
 
             if rc != 0:
                 self.module.fail_json(msg=err)
+
+        # set SELinux permissions
+        if HAS_SELINUX:
+            selinux.selinux_lsetfilecon_default(self.cron_file)
 
     def do_comment(self, name):
         return "%s%s" % (self.ansible, name)
@@ -690,8 +731,9 @@ def main():
                 changed = True
 
     # no changes to env/job, but existing crontab needs a terminating newline
-    if not changed and not crontab.existing.endswith(('\r', '\n')):
-        changed = True
+    if not changed:
+        if not (crontab.existing.endswith('\r') or crontab.existing.endswith('\n')):
+            changed = True
 
     res_args = dict(
         jobs = crontab.get_jobnames(),
@@ -733,5 +775,5 @@ def main():
 # import module snippets
 from ansible.module_utils.basic import *
 
-main()
-
+if __name__ == '__main__':
+    main()

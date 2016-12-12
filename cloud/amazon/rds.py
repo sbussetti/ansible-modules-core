@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+ANSIBLE_METADATA = {'status': ['stableinterface'],
+                    'supported_by': 'community',
+                    'version': '1.0'}
+
 DOCUMENTATION = '''
 ---
 module: rds
@@ -301,9 +305,9 @@ EXAMPLES = '''
      instance_name: MyNewInstanceName
      region: us-west-2
      vpc_security_groups: sg-xxx945xx
-          
-- debug: msg="The new db endpoint is {{ rds.instance.endpoint }}"
 
+- debug:
+    msg: "The new db endpoint is {{ rds.instance.endpoint }}"
 '''
 
 import sys
@@ -1104,4 +1108,5 @@ def main():
 from ansible.module_utils.basic import *
 from ansible.module_utils.ec2 import *
 
-main()
+if __name__ == '__main__':
+    main()
